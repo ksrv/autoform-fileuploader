@@ -1,0 +1,62 @@
+<template name="ksrvFileUploader">
+  <div class="file-uploader-item">
+    {{#if file}}
+      {{#with file}}
+        {{#if isUploaded}}
+          {{> ksrvFileUploaderPreview }}
+        {{else}}
+          {{> ksrvFileUploaderProgressBar }}
+        {{/if}}
+      {{/with}}
+    {{else}}
+      {{> ksrvFileUploaderAddButton }}
+    {{/if}}
+     <input {{attr}}/>
+  </div>
+</template>
+
+<template name="ksrvFileUploaderPreview">
+  <div class="file-uploader-preview">
+    {{#if isImage }}
+      {{> ksrvFileUploaderPreviewImage }}
+    {{else}}
+      {{> ksrvFileUploaderPreviewFile }}
+    {{/if}}
+    {{> ksrvFileUploaderRemoveButton }}
+  </div>
+</template>
+
+<template name="ksrvFileUploaderPreviewImage">
+  <a href="{{ url }}" target="_blank">
+    <img class="img-responsive img-thumbnail" src="{{ url store=this.atts.previewStore }}"/>
+  </a>
+</template>
+
+<template name="ksrvFileUploaderPreviewFile">
+  <a href="{{ url }}" target="_blank">
+    <i class="fa fa-3x fa-{{ icon }}"></i>
+  </a>
+</template>
+
+<template name="ksrvFileUploaderProgressBar">
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="{{uploadProgress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{uploadProgress}}%;">
+      {{uploadProgress}}%
+    </div>
+  </div>
+</template>
+
+<!-- @see https://habrahabr.ru/post/189570/ -->
+<template name="ksrvFileUploaderAddButton">
+  <label class="file-uploader-addlabel">
+    <span class="btn btn-default {{atts.addButtonClass}}"><i class="fa fa-plus"></i>{{#if atts.addButtonLabel }} {{ atts.addButtonLabel }}{{ else }}Выбрать файл{{/if}}</span>
+    <input {{attr}} />
+  </label>
+</template>
+
+<template name="ksrvFileUploaderRemoveButton">
+  <button class="btn btn-danger" type="button" name="remove">
+    <i class="fa fa-times"></i>
+    {{#if atts.removeButtonLabel }}{{ atts.removeButtonLabel }}{{/if}}
+  </button>
+</template>

@@ -1,0 +1,58 @@
+.file-uploader-item
+{
+    display: block;
+}
+.file-uploader-item button[name=select]
+{
+    display: block;
+    position: relative;
+    margin: 0 auto;
+}
+.file-uploader-item .file-uploader-preview
+{
+    display: block;
+    position: relative;
+    margin: 0 auto;
+    min-height: 34px;
+}
+.file-uploader-item .file-uploader-preview img
+{
+    display: block;
+    position: relative;
+}
+.file-uploader-item .file-uploader-preview button[name=remove]
+{
+    display: block;
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+}
+
+.file-uploader-item .file-uploader-addlabel
+{
+    display: block;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.file-uploader-item .file-uploader-addlabel:after
+{
+    display: none !important;
+}
+
+.file-uploader-item .file-uploader-addlabel .btn 
+{
+    /*display: block;*/
+    height: 100%;
+}
+
+.file-uploader-item .file-uploader-addlabel input[type=file]
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0
+}
