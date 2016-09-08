@@ -1,8 +1,8 @@
 
-import {Meteor}     from 'meteor/meteor';
-import {Template}   from 'meteor/templating';
-import {AutoForm}   from 'meteor/aldeed:autoform';
-import {FS}         from 'meteor/cfs:base-package';
+import { Meteor }     from 'meteor/meteor';
+import { Template }   from 'meteor/templating';
+import { AutoForm }   from 'meteor/aldeed:autoform';
+import { FS }         from 'meteor/cfs:base-package';
 import './file.html';
 
 
@@ -20,13 +20,11 @@ var getCollection = function(name){
 };
 
 Template.ksrvFileUploader.onCreated(function(){
-    if(FS.debug && typeof console == 'object'){
-        if(!(this.data && this.data.atts)){
-            if(!this.data.atts.collection){
-                console.log('Collection not defined');
-            }else if(typeof this.data.atts.collection !== 'string'){
-                console.log('Collection must be defined as string');
-            }
+    if(!(this.data && this.data.atts)){
+        if(!this.data.atts.collection){
+            console.warn('Collection not defined');
+        }else if(typeof this.data.atts.collection !== 'string'){
+            console.warn('Collection must be defined as string');
         }
     }
 
@@ -35,7 +33,8 @@ Template.ksrvFileUploader.onCreated(function(){
     template.value = new ReactiveVar(template.data.value);
 
     /**
-     * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName) для автосохранения
+     * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
+     * для автосохранения
      */
     this.setFile = function(file){
         var collection = getCollection(template.collection);
@@ -45,7 +44,8 @@ Template.ksrvFileUploader.onCreated(function(){
 
     /**
      * @todo make onError event
-     * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName) для автосохранения
+     * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
+     * для автосохранения
      */
     this.removeFile = function(fileObj){
         Meteor.call('ksrvFileUploader_remove', template.collection, fileObj._id);

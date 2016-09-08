@@ -1,3 +1,7 @@
+
+import { Meteor }     from 'meteor/meteor';
+import { FS }         from 'meteor/cfs:base-package';
+
 /**
  * Подписка на файлы определенной коллекции
  */
@@ -14,11 +18,9 @@ Meteor.methods({
      * Удаление файла
      */
     ksrvFileUploader_remove: function(collectionName, fileId, callback){
-        if(!Meteor.userId()){
-            throw new Meteor.Error(403, 'Access denied');
-        }
 
         var collection = FS._collections[collectionName];
+
         if(!collection){
             throw new Meteor.Error(404, 'Collection not found');
         }
@@ -28,9 +30,9 @@ Meteor.methods({
             throw new Meteor.Error(404, 'File not found');
         }
 
-        // if(file.owner !== Meteor.userId()){
-        //     throw new Meteor.Error(403, 'Access denied');
-        // }
+        if(file.owner && file.owner !== Meteor.userId()){
+            throw new Meteor.Error(403, 'Access denied');
+        }
 
         collection.remove({ _id: fileId });
 
