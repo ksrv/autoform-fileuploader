@@ -48,12 +48,8 @@ Template.ksrvFileUploader.onCreated(function(){
 
     this.autorun(function(){
         let data = Template.currentData();
-        let collection = data.atts.collection;
-        let value = data.value;
-        if(value){
-            template.value.set(value);
-            template.subscribe('ksrvFileUploader', collection, value);
-        }
+        template.value.set(data.value);
+        template.subscribe('ksrvFileUploader', data.atts.collection, data.value);
     });
 });
 
@@ -65,13 +61,13 @@ Template.ksrvFileUploader.onRendered(function(){
 });
 
 Template.ksrvFileUploader.helpers({
-    file: function(){
+    file () {
         return  getCollection(this.atts.collection).findOne({ 
             _id: Template.instance().value.get() 
         });
     },
 
-    attr: function(){
+    attr () {
         var atts = _.clone(this.atts);
         atts.value = Template.instance().value.get();
         atts.type = 'hidden';
@@ -92,7 +88,7 @@ Template.ksrvFileUploader.events({
 });
 
 Template.ksrvFileUploaderAddButton.helpers({
-    attr: function(){
+    attr () {
         var atts = _.clone(this.atts);
         atts.name = 'fileselect';
         atts.type = 'file';
@@ -101,7 +97,7 @@ Template.ksrvFileUploaderAddButton.helpers({
 });
 
 Template.ksrvFileUploaderPreviewFile.helpers({
-    icon: function() {
+    icon () {
         switch (this.extension()) {
             case 'pdf':
                 return 'file-pdf-o';
