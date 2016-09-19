@@ -46,7 +46,18 @@ Template.ksrvFileUploader.onCreated(function(){
         Meteor.call('ksrvFileUploader_remove', template.data.atts.collection, fileObj._id);
     };
 
-    this.autorun(function(){
+    /**
+     * On select file
+     */
+    this.autorun(function () {
+        let value = template.value.get();
+        template.subscribe('ksrvFileUploader', template.data.atts.collection, value);
+    });
+
+    /**
+     * On change input data
+     */
+    this.autorun(function () {
         let data = Template.currentData();
         template.value.set(data.value);
         template.subscribe('ksrvFileUploader', data.atts.collection, data.value);
