@@ -8,13 +8,9 @@ import './file.html';
 
 AutoForm.addInputType('file-uploader', {
     template: 'ksrvFileUploader',
-    
-    valueOut: function(){
-        return this.val();
-    }
+    valueOut () { return this.val() }
 });
 
-// FS.debug = true;
 var getCollection = function(name){
     return FS._collections[name] || window[name];
 };
@@ -28,16 +24,15 @@ Template.ksrvFileUploader.onCreated(function(){
         }
     }
 
-    var template = this;
-    template.collection = template.data.atts.collection;
-    template.value = new ReactiveVar(template.data.value);
+    const template = this;
+    this.value = new ReactiveVar(template.data.value);
 
     /**
      * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
      * для автосохранения
      */
     this.setFile = function(file){
-        var collection = getCollection(template.collection);
+        var collection = getCollection(template.data.atts.collection);
         var fileObj = collection.insert(new FS.File(file));
         template.value.set(fileObj._id);
     };
@@ -48,14 +43,15 @@ Template.ksrvFileUploader.onCreated(function(){
      * для автосохранения
      */
     this.removeFile = function(fileObj){
-        Meteor.call('ksrvFileUploader_remove', template.collection, fileObj._id);
+        Meteor.call('ksrvFileUploader_remove', template.data.atts.collection, fileObj._id);
     };
 
     this.autorun(function(){
-        var template = Template.instance();
-        var collection = template.data.atts.collection;
-        var value = template.value.get();
+        let data = Template.currentData();
+        let collection = data.atts.collection;
+        let value = data.value;
         if(value){
+            template.value.set(value);
             template.subscribe('ksrvFileUploader', collection, value);
         }
     });

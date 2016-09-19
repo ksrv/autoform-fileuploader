@@ -1,6 +1,6 @@
 Package.describe({
   name: 'ksrv:autoform-fileuploader',
-  version: '0.0.2',
+  version: '0.0.3',
   summary: 'Yet another filuploader for autoform',
   git: 'https://github.com/ksrv/autoform-fileuploader',
   documentation: 'README.md'
