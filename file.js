@@ -24,17 +24,17 @@ Template.ksrvFileUploader.onCreated(function(){
         }
     }
 
-    const template = this;
-    this.value = new ReactiveVar(template.data.value);
+    this.value = new ReactiveVar(this.data.value);
+    this.cn = this.data.atts.collection;
+    this.collection = getCollection(this.cn);
 
     /**
      * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
      * для автосохранения
      */
-    this.setFile = function(file){
-        var collection = getCollection(template.data.atts.collection);
-        var fileObj = collection.insert(new FS.File(file));
-        template.value.set(fileObj._id);
+    this.setFile = (file) => {
+        let fileObj = this.collection.insert(new FS.File(file));
+        this.value.set(fileObj._id);
     };
 
     /**
@@ -42,40 +42,31 @@ Template.ksrvFileUploader.onCreated(function(){
      * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
      * для автосохранения
      */
-    this.removeFile = function(fileObj){
-        Meteor.call('ksrvFileUploader_remove', template.data.atts.collection, fileObj._id);
+    this.removeFile = (fileObj) => {
+        Meteor.call('ksrvFileUploader_remove', this.cn, fileObj._id);
     };
 
     /**
      * On select file
      */
-    this.autorun(function () {
-        let value = template.value.get();
-        template.subscribe('ksrvFileUploader', template.data.atts.collection, value);
+    this.autorun(() => {
+        this.subscribe('ksrvFileUploader', this.cn, this.value.get());
     });
 
-    /**
-     * On change input data
-     */
-    this.autorun(function () {
-        let data = Template.currentData();
-        template.value.set(data.value);
-        template.subscribe('ksrvFileUploader', data.atts.collection, data.value);
-    });
+    this.file = () => {
+        return  this.collection.findOne({ _id: this.value.get() });
+    }
 });
 
 Template.ksrvFileUploader.onRendered(function(){
-    var template = this;
-    $('#'+AutoForm.getFormId()).on('reset', function(){
-        template.value.set(false);
+    $(`#${AutoForm.getFormId()}`).on('reset', () => {
+        this.value.set(false);
     });
 });
 
 Template.ksrvFileUploader.helpers({
     file () {
-        return  getCollection(this.atts.collection).findOne({ 
-            _id: Template.instance().value.get() 
-        });
+        return Template.instance().file();
     },
 
     attr () {
