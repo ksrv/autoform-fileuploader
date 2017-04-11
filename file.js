@@ -7,75 +7,85 @@ import './file.html';
 
 
 AutoForm.addInputType('file-uploader', {
-    template: 'ksrvFileUploader',
-    valueOut () { return this.val() }
-});
+  template: 'ksrvFileUploader',
+  valueOut () { return this.val() },
+  contextAdjust (context) {
+    // context.value = new ReactiveVar(context.value)
+    console.log('coontext', context)
+    return context
+  }
+})
 
-var getCollection = function(name){
-    return FS._collections[name] || window[name];
-};
+const getCollection = name => {
+  return FS._collections[name] || window[name]
+}
 
 Template.ksrvFileUploader.onCreated(function(){
-    if(!(this.data && this.data.atts)){
-        if(!this.data.atts.collection){
-            console.warn('Collection not defined');
-        }else if(typeof this.data.atts.collection !== 'string'){
-            console.warn('Collection must be defined as string');
-        }
+  if (!(this.data && this.data.atts)) {
+    if (!this.data.atts.collection) {
+      console.warn('Collection not defined')
+    } else if (typeof this.data.atts.collection !== 'string') {
+      console.warn('Collection must be defined as string')
     }
+  }
 
-    this.value = new ReactiveVar(this.data.value);
-    this.cn = this.data.atts.collection;
-    this.collection = getCollection(this.cn);
+  this.subscribe('ksrvFileUploader', this.data.atts.collection, this.data.value)
 
-    /**
-     * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
-     * для автосохранения
-     */
-    this.setFile = (file) => {
-        let fileObj = this.collection.insert(new FS.File(file));
-        this.value.set(fileObj._id);
-    };
+  this.temp = new ReactiveVar()
 
-    /**
-     * @todo make onError event
-     * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
-     * для автосохранения
-     */
-    this.removeFile = (fileObj) => {
-        Meteor.call('ksrvFileUploader_remove', this.cn, fileObj._id);
-    };
+  this.collection = () => getCollection(this.data.atts.collection)
 
-    /**
-     * On select file
-     */
-    this.autorun(() => {
-        this.subscribe('ksrvFileUploader', this.cn, this.value.get());
-    });
+  /**
+   * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
+   * для автосохранения
+   */
+  this.setFile = file => {
+    const fileObj = this.collection().insert(new FS.File(file));
+    this.temp.set(fileObj._id)
+    this.subscribe('ksrvFileUploader', this.data.atts.collection, fileObj._id)
+  }
 
-    this.file = () => {
-        return  this.collection.findOne({ _id: this.value.get() });
-    }
+  /**
+   * @todo make onError event
+   * @todo попробовать AutoForm.updateTrackedFieldValue(template, fieldName)
+   * для автосохранения
+   */
+  this.removeFile = fileObj => {
+    Meteor.call('ksrvFileUploader_remove', this.data.atts.collection, fileObj._id)
+  }
+
+  /**
+   * On select file
+   */
+  this.file = () => {
+    return  this.collection.findOne({ _id: this.value.get() });
+  }
 });
 
 Template.ksrvFileUploader.onRendered(function(){
-    $(`#${AutoForm.getFormId()}`).on('reset', () => {
-        this.value.set(false);
-    });
-});
+  $(`#${AutoForm.getFormId()}`).on('reset', () => {
+    this.temp = '';
+  })
+})
 
 Template.ksrvFileUploader.helpers({
-    file () {
-        return Template.instance().file();
-    },
+  file () {
+    const template = Template.instance()
+    const temp = template.temp.get()
+    const value = temp != null ? temp : this.value
+    const collection = template.collection()
+    return collection.findOne({ _id: value })
+  },
 
-    attr () {
-        var atts = _.clone(this.atts);
-        atts.value = Template.instance().value.get();
-        atts.type = 'hidden';
-        return _.pick(atts, 'id', 'name', 'type', 'data-schema-key', 'value');
-    }
-});
+  attr () {
+    const { id, name } = this.atts
+    const template = Template.instance()
+    const temp = template.temp.get()
+    const value = temp != null ? temp : this.value
+    const type = 'hidden'
+    return { id, name, type, value, 'data-schema-key': this.atts['data-schema-key'] }
+  }
+})
 
 Template.ksrvFileUploader.events({
     'change [name=fileselect]': function(event, template){
